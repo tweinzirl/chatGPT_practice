@@ -1,0 +1,25 @@
+It has been over 6 months since the public release of ChatGPT in November 2022. The service was an immediate hit. As the most sophisticated example of a large language model (LLM) to date, the Internet wasted no time in interrogating its capabilities. As LLMs mature, dependence on such AI in daily life could increase dramatically.
+
+While the interactive web app [link] is the easiest way for users to leverage ChatGPT, novel future applications will require either API access to remote systems or complete embedding of an LLM. This article memorializes the key lessons about using OpenAI's ChatGPT API [link] in the short courses on offer by deeplearning.ai [link]. The most surprising takeaway from the courses was that basic Python skills combined with the OpenAI API are sufficient to build new, ChatGPT-powered systems.
+
+# something about how setup and basic use works, how to submit prompts analogously to the web app
+
+# prompt engineering best practices
+
+# example of inference with budget reasoning questions
+
+Tried to trick system by mixing units of dollars and cents. What convention did it follow: convert dollars to cents?  The final annual savings sometimes came out in cents whereas was expecting dollars. Limitations seen around conversion of cents. Tried explicitly asking for for dollars worked some of the time.
+
+Explain in exquisite detail the rational for picking each test case: confusing units sometimes mix cost per day versus cost per meal.
+
+Conclusion from testing: If limitations are found in what the prompt can do, go back to messages and be sure input currencies are standardized to dollars.
+
+Build test suite that measures success at finding the right answer and the right annual savings.  Sometimes the model could select the right choice but did something wrong in regard to the total savings (e.g., using cents versus dollars).  Assign a total score per each test message, with calculating the right answer and total savings being equally weighted.  
+
+The first prompt (v1) got N examples completely right, M examples half right, and O examples all wrong for a total score of X5.
+
+Repeat for second prompt. The total score was much better (X%). This demonstrates the impact of prompt engineering. Problems were uncovered with the model's ability to consistently convert cents to dollars. This suggests the limitation that input currency amounts be standardized to units of dollars.
+
+# Describe but don't show other capabilities, which most people are familiar with anyway: summarizing, extracting, inferring, transforming/translating.
+
+# more sophisticated data query, tables in text, also langchain sql?  query long text from embedding vector db?
