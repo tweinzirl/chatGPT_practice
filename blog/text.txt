@@ -50,11 +50,11 @@ In this next section, let's explore whether ChatGPT can handle word problems. Th
 
 I developed exercises that present options for eating out vs cooking at home. The model is supposed to evaluate each option and decide which is cheaper. In addition to choosing the right option, the model also verbalizes the cheaper option and outputs the amount saved daily and annually.
 
-Figure 6 shows my first attempt at a prompt for the base case (eating out costs $15/meal while eating at home is $5/meal; the user always eats three times a day). ChatGPT gets the right answer (eating at home; annual savings of 365*3*($15 - $5) = $10,950). Note that the model is informed that the user text will be specially marked by triple backtick delimiters (```).
+Figure 6 shows my first attempt at a prompt for the base case (eating out costs $15/meal while eating at home is $5/meal; the user always eats three times a day). ChatGPT gets the right answer (eating at home; annual savings of 365*3*($15 - $5) = $10,950). Note that it is useful in many contexts to inform the model that the user's prompt will be specially marked by triple backtick delimiters (```).
 
 [fig 6 prompt v1]
 
-Asking the same question in a second way reveals a weakness in the prompt.  In Figure 7, I presented the cost of eating at home in units of cents ($0.01), hoping to confuse the system.  The model ends of doing the calculat in units of cents, and the output savings are quoted in cents. While this is not technically wrong, it can be considered incorrect for the purpose of standardizing the output to units of dollars.
+Asking the same question in a second way reveals a weakness in the prompt.  In Figure 7, I presented the cost of eating at home in units of cents ($0.01), hoping to confuse the system.  The model ends of doing the calculation in units of cents, and the output savings are quoted in cents. While this is not technically wrong, it can be considered incorrect for the purpose of standardizing the output to units of dollars.
 
 [fig7]
 
@@ -67,16 +67,19 @@ After just two iterations, we have something promising, but it was only tested o
 [markdown table of examples]
 
 For the model to pass each example, it had to choose the right option (a or b) and calculate the total annual savings in dollars. An answer that chooses the right option while getting the units wrong is only half correct.
+The total score for each prompt comes from adding the scores for the invidicual examples. The first promot (v1) scored 40% while the second prompt (v2) scored 100%! Table 2 shows the detailed scoring for each test.
 
 [table of test rests, Test, v1 option vs savings correct, v2 option vs savings correct]
 
-The total score for each prompt comes from adding the scores for the invidicual examples. The first promot (v1) scored ... while the second prompt (v2) scored 100%!
+Let's examine in detail waht Prompt V1 got wrong. Half of Example 1 is wrong because the output savings is not in dollars. In Example 2, the letters associated with each choice are flipped, and choice (b) is listed before choice (a). ChatGPT outputs the wrong letter (a) and calculates 0 zero savings. The prompt was apparently confused by the choices not following alphabetical order. All of Example 3 is wrong because the model puts out ... code instead of numbers?  Example 4 is fully correct, and is Example 5 partial credit is awarded because the units are wrong.
 
-[some comments about what goes wrong in the first prompt]
+[figure 9 of choices out of order]
+
+^^^ make the above a bullet list?
 
 If this prompt were included in an a user-facing app, the tests should be repeated periodically to make sure that there is no regression in performance as the prompt or underlying LLM changes.
 
-# example of inference with budget reasoning questions
+{decide if any text below should be saved otherwise remove it}
 
 Introduce a few more best prompting practices:
 checking if specific conditions are met by the input, specifiying delimiter characters, and providing examples of the desired output ("few-shot prompting").
