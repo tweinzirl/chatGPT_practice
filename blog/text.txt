@@ -1,12 +1,61 @@
-It has been over 6 months since the public release of ChatGPT in November 2022. The service was an immediate hit. As the most sophisticated example of a large language model (LLM) to date, the Internet wasted no time in interrogating its capabilities. As LLMs mature, dependence on such AI in daily life could increase dramatically.
+It has been over 6 months since the public release of ChatGPT in November 2022. The service was an immediate hit. As the most sophisticated example of a large language model (LLM) to date, the Internet wasted no time in interrogating its capabilities (link: https://www.reddit.com/r/ChatGPT/comments/12xk493/what_has_chatgpt_done_recently_that_blew_your_mind/). As LLMs mature, dependence on such AI in daily life could increase dramatically.
+While the interactive web app [link: https://chat.openai.com/] is the easiest way for users to leverage ChatGPT, novel future applications will require integration into devices or services, with programmatic access being made available through APIs.
 
-While the interactive web app [link] is the easiest way for users to leverage ChatGPT, novel future applications will require either API access to remote systems or complete embedding of an LLM. This article memorializes the key lessons about using OpenAI's ChatGPT API [link] in the short courses on offer by deeplearning.ai [link]. The most surprising takeaway from the courses was that basic Python skills combined with the OpenAI API are sufficient to build new, ChatGPT-powered systems.
+OpenAI provides a ChatGPT API for Python and node.js, and the broader community provides libraries for other languages [link: https://platform.openai.com/docs/libraries]. Apart from the official documentation, another great way to learn is through the short ChatGPT courses (link: https://www.deeplearning.ai/short-courses/) currently on offer for free by DeepLearning.AI. As a new user to the API, the most surprising takeaway from the courses was that basic Python skills combined with the OpenAI API are sufficient to build new, ChatGPT-powered systems.
 
-# something about how setup and basic use works, how to submit prompts analogously to the web app
+This article memorializes the key lessons I learned about using OpenAI's ChatGPT API. It is intended to be a reference for myself and a tutorial for new users to the API.
+
+# Basic setup and authentication
+
+Getting started in Python requires two steps: 1) installing the OpenAI module (pip install openai) and 2) acquiring an API key [https://platform.openai.com/account/api-keys]. In code, the API needs to be aware of the API key. It is not recommended to hardcode the key in the code itslef, and such code should never be submitted to a public repository. A simple alternative is to store the api in a local file called .env and to use the dotenv module [https://github.com/theskumar/python-dotenv] (pip install dotenv) to detect the file and load the key as an environment variable.  Figure 1 provides an example of how this can work:
+
+[fig1.png of authentication]
+
+# Your first API call
+
+Everything is now in place start talking to ChatGPT. The Chat Completion (https://platform.openai.com/docs/api-reference/chat/create) function creates a model response given a chat conversation. The chat conversation can be a single prompt or an entire chat history. In either case, the model parses the text and returns the most likely response. 
+
+Figure 2 shows an example helper function for obtaining the response for a single prompt. This function produces a reponse for exactly one message. Followup calls with different messages will be treated as different conversations.
+
+[fig2.png message completion]
+
+A few comments are in order.
+ 1) The 'model' argument configures which language model to use. The GPT-3.5 model family can generate natural language and computer code. Of these, gpt-3.5-turbo is recommended as the best performance per cost ($0.002 per 1K tokens, which is approximately 750 words). The full list of models is available here [https://platform.openai.com/docs/models/overview]. 
+
+ 5) The 'temperature' argument controls the randomness of the response.  Allowable values are in the range [0, 2] and lower values correspond to less randomness.  Even at temperature 0, however, the model is mostly but not entirely deterministic.
+
+The chatCompletion call returns a particular kind of object (openai.openai_object.OpenAIObject) that contains the desired reponse plus additional meta data.  From the full output ('repsonse'), we want only a small piece (response.choices[0].message["content"]). Figure 3 shows the fullresponse and, at the very bottom, the desired relevant output.
+
+[fig 3 output example]
+
+The input prompt can be 'engineered' to maximize the utility of the single output message ("prompt engineering" [https://en.wikipedia.org/wiki/Prompt_engineering] is an emerging new skill in the application of LLMs). In this case, we can tell ChatGPT to include more fields (year written, ashort summary) and to format the output as a JSON object. If we were interested in using this as a Python object, we could convert with Python's built-in JSON utilities.
+
+[fig 4 updated output]
+
+This example highlights the importance of writing clear and specific instructions, which can include asking for structured output.
+
+# Multi-message chats
+
+The ChatGPT model is stateless. Producing coherent conversations requires that all previous messages in the conversation be uploaded every time (increasing the number of tokens used) for the model for generate the next most likely response. The illusion of continuity is created at the expense of each API call becoming slightly more costly as a conversation unfolds.
+
+In the above get_completion function, the user prompt is formatted into a list ('messages') of dictionaries. Each dictionary encodes one message ('content') and the source ('role'). The 'role' indicates the source of each piece of dialog. It has one of three values: 'user' (the human), 'assistant' (the chatbot), and 'system' (context for the assistant not meant to be visible to the user). A multi-message chat will retain the full history of all messages for each role.
+
+Figure 5 demonstrates to pass a multiple messages to the ChatGPT. In this case, the system role is instructing the assistant that is is to speak like Shakespeare, and that the user cannot override that style.  The user then asks to hear a joke in a different style. The model apologizes that it must stick to the specified original style and then delivers a four-line joke complete with rhyme.
+
+[Fig 5 input]
+
+# Can ChatGPT reason about math problems?
+
+For this next test
+
 
 # prompt engineering best practices
 
 # example of inference with budget reasoning questions
+
+Introduce a few more best prompting practices:
+checking if specific conditions are met by the input, specifiying delimiter characters, and providing examples of the desired output ("few-shot prompting").
+Give the model time to think, e.g., by explicitly spelling out required steps and asking the model to check its own work along the way.
 
 Tried to trick system by mixing units of dollars and cents. What convention did it follow: convert dollars to cents?  The final annual savings sometimes came out in cents whereas was expecting dollars. Limitations seen around conversion of cents. Tried explicitly asking for for dollars worked some of the time.
 
@@ -23,3 +72,12 @@ Repeat for second prompt. The total score was much better (X%). This demonstrate
 # Describe but don't show other capabilities, which most people are familiar with anyway: summarizing, extracting, inferring, transforming/translating.
 
 # more sophisticated data query, tables in text, also langchain sql?  query long text from embedding vector db?
+
+# Conclusion
+
+This article has demonstrated important strategies in designing prompts for ChatGPT LLMs.
+[enumerate specific output format, clear instructions in the user and/or system roles,
+giving the model time to think by spelling out in detail the steps it should follow.
+Testing of prompts is best done iteratively with a collection of well-designed examples.
+Detailed responses can be graded in terms of more than one criteria, and a composite score comes from adding up the grades for each example. For prompts under active development, the tests should be re-run periodically to prevent regressions in system performance.
+]
