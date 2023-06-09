@@ -48,9 +48,9 @@ Figure 5 demonstrates to pass a multiple messages to the ChatGPT. In this case, 
 
 In this next section, let's explore whether ChatGPT can handle word problems. The answer is "yes, if prompted suitably".
 
-I developed exercises that present options for eating out vs cooking at home. The model is supposed to evaluate each option and decide which is cheaper. In addition to choosing the right option, the model also verbalizes the cheaper option and outputs the amount saved daily and annually.
+I developed exercises that present options for eating out versus cooking at home. The model is supposed to evaluate each option and decide which is cheaper. In addition to choosing the right option, the model also verbalizes the cheaper option and outputs the amount saved daily and annually.
 
-Figure 6 shows my first attempt at a prompt for the base case (eating out costs $15/meal while eating at home is $5/meal; the user always eats three times a day). ChatGPT gets the right answer (eating at home; annual savings of 365*3*($15 - $5) = $10,950). Note that it is useful in many contexts to inform the model that the user's prompt will be specially marked by triple backtick delimiters (```).
+Figure 6 shows my first attempt (V1) at a prompt for the base case (eating out costs $15/meal while eating at home is $5/meal; the user always eats three times a day). ChatGPT gets the right answer (eating at home; annual savings of 365*3*($15 - $5) = $10,950). Note that it is useful in many contexts to inform the model that the user's prompt will be specially marked by delimiters such as triple backticks (```).
 
 [fig 6 prompt v1]
 
@@ -58,26 +58,30 @@ Asking the same question in a second way reveals a weakness in the prompt.  In F
 
 [fig7]
 
-Figure 8 shows the second version of the prompt in which the model is told to calculate in dollars and make the decision based on the total number of dollars spent per day. The description for the output also reminds the model that daily and annual savings need to be presented in dollars. This version of the prompt produced the expected output.
+Figure 8 shows the second version (V2) of the prompt in which the model is told to calculate in dollars and make the decision based on the total number of dollars spent per day. The description for the output also reminds the model that daily and annual savings need to be presented in dollars. This version of the prompt produced the expected output.
 
 [fig8]
 
-After just two iterations, we have something promising, but it was only tested on one example. Prompts are ideally tested in aggregate on a battery of examples. The two prompts were tested on the set of five examples described in Table 1. Example 1 is the base case. Examples 2 and 3 mix dollars and cents. Example 4 mixes total cost per day and the total cost per meal.  Example 5 does the same while mixing dollars and cents too.
+After just two iterations, the results were promising. However, prompts are ideally tested on a battery of examples. The two prompts were tested on the set of five examples described in Table 1. Example 1 is the base case. Examples 2 and 3 mix dollars and cents. Example 4 mixes total cost per day and the total cost per meal. Example 5 does the same while mixing dollars and cents too.
 
-[markdown table of examples]
+[table1]
 
 For the model to pass each example, it had to choose the right option (a or b) and calculate the total annual savings in dollars. An answer that chooses the right option while getting the units wrong is only half correct.
 The total score for each prompt comes from adding the scores for the invidicual examples. The first promot (v1) scored 40% while the second prompt (v2) scored 100%! Table 2 shows the detailed scoring for each test.
 
 [table of test rests, Test, v1 option vs savings correct, v2 option vs savings correct]
 
-Let's examine in detail waht Prompt V1 got wrong. Half of Example 1 is wrong because the output savings is not in dollars. In Example 2, the letters associated with each choice are flipped, and choice (b) is listed before choice (a). ChatGPT outputs the wrong letter (a) and calculates 0 zero savings. The prompt was apparently confused by the choices not following alphabetical order. All of Example 3 is wrong because the model puts out ... code instead of numbers?  Example 4 is fully correct, and is Example 5 partial credit is awarded because the units are wrong.
+Let's examine in detail what Prompt V1 got wrong. 
+[bullet list]
+Half of Example 1 is wrong because the output savings is not in dollars. In Example 2, the letters associated with each choice are flipped, and choice (b) is listed before choice (a). ChatGPT outputs the wrong letter (a) and calculates 0 zero savings. The prompt was apparently confused by the choices not following alphabetical order. All of Example 3 is wrong because the model puts out ... code instead of numbers?  Example 4 is fully correct, and is Example 5 partial credit is awarded because the units are wrong.
 
 [figure 9 of choices out of order]
 
-^^^ make the above a bullet list?
+How is prompt V2 guiding to model to get the right answer every time? The prompt is specific? enough that it is spurring the ChatGPT to write it's own robust Python code that get's the right answer every time. At the end of the code blob (Figure 10?), the model is producing it's own JSON blob?
 
-If this prompt were included in an a user-facing app, the tests should be repeated periodically to make sure that there is no regression in performance as the prompt or underlying LLM changes.
+[possible fig 10]
+
+If this prompt were included in an a user-facing app, the tests should be repeated periodically to make sure that there is no regression in performance as the prompt or underlying LLM changes. If prompt V2 begins as further examples were added, the decision to e.g., standardize the currency amounts to dollars might have to be made.
 
 {decide if any text below should be saved otherwise remove it}
 
@@ -85,28 +89,14 @@ Introduce a few more best prompting practices:
 checking if specific conditions are met by the input, specifiying delimiter characters, and providing examples of the desired output ("few-shot prompting").
 Give the model time to think, e.g., by explicitly spelling out required steps and asking the model to check its own work along the way.
 
-Tried to trick system by mixing units of dollars and cents. What convention did it follow: convert dollars to cents?  The final annual savings sometimes came out in cents whereas was expecting dollars. Limitations seen around conversion of cents. Tried explicitly asking for for dollars worked some of the time.
 
-Explain in exquisite detail the rational for picking each test case: confusing units sometimes mix cost per day versus cost per meal.
-
-Conclusion from testing: If limitations are found in what the prompt can do, go back to messages and be sure input currencies are standardized to dollars.
-
-Build test suite that measures success at finding the right answer and the right annual savings.  Sometimes the model could select the right choice but did something wrong in regard to the total savings (e.g., using cents versus dollars).  Assign a total score per each test message, with calculating the right answer and total savings being equally weighted.  
-
-The first prompt (v1) got N examples completely right, M examples half right, and O examples all wrong for a total score of X5.
-
-Repeat for second prompt. The total score was much better (X%). This demonstrates the impact of prompt engineering. Problems were uncovered with the model's ability to consistently convert cents to dollars. This suggests the limitation that input currency amounts be standardized to units of dollars.
-
-# Describe but don't show other capabilities, which most people are familiar with anyway: summarizing, extracting, inferring, transforming/translating.
-
-# more sophisticated data query, tables in text, also langchain sql?  query long text from embedding vector db?
+# Reference but don't show other capabilities, which most people are familiar with anyway: summarizing, extracting, inferring, transforming/translating.
 
 # Conclusion
 
 This article has demonstrated important strategies in designing prompts for ChatGPT LLMs.
-[enumerate specific output format, clear instructions in the user and/or system roles,
-giving the model time to think by spelling out in detail the steps it should follow.
-Prompt development is iterative.
-Testing of prompts is best done iteratively with a collection of well-designed examples.
+The importance of providing clear and speific structructions, giving the model the opportunity to think through explicitly defined steps, and asking for structured output were all highlighted.
+Prompt development is iterative and is best done systematically?. Testing of prompts is can be done stepwise with a collection of well-designed examples.
 Detailed responses can be graded in terms of more than one criteria, and a composite score comes from adding up the grades for each example. For prompts under active development, the tests should be re-run periodically to prevent regressions in system performance.
-]
+
+Hopefully this article helps and inspires you to get started building new applications with ChatGPT!
