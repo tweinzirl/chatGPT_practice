@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{pdflscape}
+\begin{document}
+
+%landscape :https://tex.stackexchange.com/questions/3930/how-to-rotate-landscape-table-page-in-pdf
+\newgeometry{margin=1cm} % modify this if you need even more space
+\begin{landscape}
+
+% table 1, Test, (av), (B), Comment
+% https://www.overleaf.com/articles/lab-report/qkwvdyjvmkhg
+
+
+\centering
+\begin{table}[!h]
+\centering
+\begin{tabular}{|l|p {.45\textwidth}|p {.45\textwidth}| p {.3\textwidth}|}
+	\hline
+	Test \# &  (a) & (b)  & Comment \\
+	\hline\hline
+	1 &  cooking at home three times a day spending on average \textbf{500 cents} per each meal&  eating out three times a day at an average cost of \textbf{\$15} per meal& Base case\\
+    \hline
+	2 & eating out three times a day at an average cost of \textbf{\$15} per meal &  cooking at home three times a day spending on average \textbf{500 cents} per each meal& Base case with options swapped\\
+    \hline
+	3 & cooking at home three times a day spending on average \textbf{1500 cents} per each meal &  eating out three times a day at an average cost of \textbf{\$10} per meal& Eating out (b) is cheaper \\
+    \hline
+	4 & cooking at home spending on average \textbf{\$15 per each day} &  eating out three times a day at an average cost of \textbf{\$15 per meal}& (a) quotes price per day instead of per meal\\
+    \hline
+	5 & cooking at home three times a day spending on average \textbf{500 cents per each meal} &  eating out at an average cost of \textbf{\$45 per each day}& Mix cents per meal and dollars per day\\
+	\hline
+\end{tabular}
+\caption{Summary of tests}
+\label{t1}
+\end{table}
+
+\centering
+\begin{table}[!h]
+\centering
+\begin{tabular}{|l|p {.45\textwidth}|p {.45\textwidth}| p {.3\textwidth}|}
+	\hline
+	Test \# &  (a) & (b)  & Comment \\
+	\hline\hline
+	1 &  cooking at home three times a day spending on average \textbf{500 cents} per each meal&  eating out three times a day at an average cost of \textbf{\$15} per meal& Base case\\
+    \hline
+	2 & eating out three times a day at an average cost of \textbf{\$15} per meal &  cooking at home three times a day spending on average \textbf{500 cents} per each meal& Base case with options swapped\\
+    \hline
+	3 & cooking at home three times a day spending on average \textbf{1500 cents} per each meal &  eating out three times a day at an average cost of \textbf{\$10} per meal& Eating out (b) is cheaper \\
+    \hline
+	4 & cooking at home spending on average \textbf{\$15 per each day} &  eating out three times a day at an average cost of \textbf{\$15 per meal}& (a) quotes price per day instead of per meal\\
+    \hline
+	5 & cooking at home three times a day spending on average \textbf{500 cents per each meal} &  eating out at an average cost of \textbf{\$45 per each day}& Mix cents per meal and dollars per day\\
+	\hline
+\end{tabular}
+\caption{Summary of tests}
+\label{t1}
+\end{table}
+
+
+
+\end{landscape}
+\restoregeometry
+
+\end{document}
