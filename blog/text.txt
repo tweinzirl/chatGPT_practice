@@ -3,7 +3,7 @@ While the interactive web app [link: https://chat.openai.com/] is the easiest wa
 
 OpenAI provides a ChatGPT API for Python and node.js, and the broader community provides libraries for other languages [link: https://platform.openai.com/docs/libraries]. Apart from the official documentation, another great way to learn is through the short ChatGPT courses (link: https://www.deeplearning.ai/short-courses/) currently on offer for free by DeepLearning.AI. As a new user to the API, the most surprising takeaway from the courses was that basic Python skills combined with the OpenAI API are sufficient to build new, ChatGPT-powered systems.
 
-This article memorializes the key lessons I learned about using OpenAI's ChatGPT API. It is intended to be a reference for myself and a tutorial for new users to the API.
+This article memorializes the key lessons I learned about using OpenAI's ChatGPT API. It is intended to be a reference for myself and a tutorial for new users to the API. The resources from the short courses are available here [https://github.com/tweinzirl/chatGPT_practice/tree/master] and the original examples produced for this article are here [https://github.com/tweinzirl/chatGPT_practice/tree/master/blog].
 
 # Basic setup and authentication
 
@@ -44,12 +44,37 @@ Figure 5 demonstrates to pass a multiple messages to the ChatGPT. In this case, 
 
 [Fig 5 input]
 
-# Can ChatGPT reason about math problems?
+# Reasoning about math word problems
 
-For this next test
+In this next section, let's explore whether ChatGPT can handle word problems. The answer is "yes, if prompted suitably".
 
+I developed exercises that present options for eating out vs cooking at home. The model is supposed to evaluate each option and decide which is cheaper. In addition to choosing the right option, the model also verbalizes the cheaper option and outputs the amount saved daily and annually.
 
-# prompt engineering best practices
+Figure 6 shows my first attempt at a prompt for the base case (eating out costs $15/meal while eating at home is $5/meal; the user always eats three times a day). ChatGPT gets the right answer (eating at home; annual savings of 365*3*($15 - $5) = $10,950). Note that the model is informed that the user text will be specially marked by triple backtick delimiters (```).
+
+[fig 6 prompt v1]
+
+Asking the same question in a second way reveals a weakness in the prompt.  In Figure 7, I presented the cost of eating at home in units of cents ($0.01), hoping to confuse the system.  The model ends of doing the calculat in units of cents, and the output savings are quoted in cents. While this is not technically wrong, it can be considered incorrect for the purpose of standardizing the output to units of dollars.
+
+[fig7]
+
+Figure 8 shows the second version of the prompt in which the model is told to calculate in dollars and make the decision based on the total number of dollars spent per day. The description for the output also reminds the model that daily and annual savings need to be presented in dollars. This version of the prompt produced the expected output.
+
+[fig8]
+
+After just two iterations, we have something promising, but it was only tested on one example. Prompts are ideally tested in aggregate on a battery of examples. The two prompts were tested on the set of five examples described in Table 1. Example 1 is the base case. Examples 2 and 3 mix dollars and cents. Example 4 mixes total cost per day and the total cost per meal.  Example 5 does the same while mixing dollars and cents too.
+
+[markdown table of examples]
+
+For the model to pass each example, it had to choose the right option (a or b) and calculate the total annual savings in dollars. An answer that chooses the right option while getting the units wrong is only half correct.
+
+[table of test rests, Test, v1 option vs savings correct, v2 option vs savings correct]
+
+The total score for each prompt comes from adding the scores for the invidicual examples. The first promot (v1) scored ... while the second prompt (v2) scored 100%!
+
+[some comments about what goes wrong in the first prompt]
+
+If this prompt were included in an a user-facing app, the tests should be repeated periodically to make sure that there is no regression in performance as the prompt or underlying LLM changes.
 
 # example of inference with budget reasoning questions
 
@@ -78,6 +103,7 @@ Repeat for second prompt. The total score was much better (X%). This demonstrate
 This article has demonstrated important strategies in designing prompts for ChatGPT LLMs.
 [enumerate specific output format, clear instructions in the user and/or system roles,
 giving the model time to think by spelling out in detail the steps it should follow.
+Prompt development is iterative.
 Testing of prompts is best done iteratively with a collection of well-designed examples.
 Detailed responses can be graded in terms of more than one criteria, and a composite score comes from adding up the grades for each example. For prompts under active development, the tests should be re-run periodically to prevent regressions in system performance.
 ]
