@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{geometry}
 \usepackage{pdflscape}
+\usepackage{multirow}
 \begin{document}
 
 %landscape :https://tex.stackexchange.com/questions/3930/how-to-rotate-landscape-table-page-in-pdf
@@ -16,7 +17,7 @@
 \centering
 \begin{tabular}{|l|p {.45\textwidth}|p {.45\textwidth}| p {.3\textwidth}|}
 	\hline
-	Test \# &  (a) & (b)  & Comment \\
+	\textbf{Test \#} & \textbf{Option (a)} & \textbf{Option (b)} & \textbf{Comment} \\
 	\hline\hline
 	1 &  cooking at home three times a day spending on average \textbf{500 cents} per each meal&  eating out three times a day at an average cost of \textbf{\$15} per meal& Base case\\
     \hline
@@ -36,22 +37,27 @@
 \centering
 \begin{table}[!h]
 \centering
-\begin{tabular}{|l|p {.45\textwidth}|p {.45\textwidth}| p {.3\textwidth}|}
+\begin{tabular}{|c|c|c|c|c|}
 	\hline
-	Test \# &  (a) & (b)  & Comment \\
-	\hline\hline
-	1 &  cooking at home three times a day spending on average \textbf{500 cents} per each meal&  eating out three times a day at an average cost of \textbf{\$15} per meal& Base case\\
+    \textbf{Test \#} & 
+    \multicolumn{2}{|c|}{\textbf{Prompt V1}} &
+    \multicolumn{2}{|c|}{\textbf{Prompt V2}}\\
+    %Test \# & Correct choice & Savings correct & Correct choice & Savings correct \\
     \hline
-	2 & eating out three times a day at an average cost of \textbf{\$15} per meal &  cooking at home three times a day spending on average \textbf{500 cents} per each meal& Base case with options swapped\\
+    & \textbf{Correct choice} & \textbf{Savings correct} & \textbf{Correct choice} & \textbf{Savings correct} \\
     \hline
-	3 & cooking at home three times a day spending on average \textbf{1500 cents} per each meal &  eating out three times a day at an average cost of \textbf{\$10} per meal& Eating out (b) is cheaper \\
+    1 &Y&N&Y&Y\\
     \hline
-	4 & cooking at home spending on average \textbf{\$15 per each day} &  eating out three times a day at an average cost of \textbf{\$15 per meal}& (a) quotes price per day instead of per meal\\
+    2 &N&N&Y&Y\\
     \hline
-	5 & cooking at home three times a day spending on average \textbf{500 cents per each meal} &  eating out at an average cost of \textbf{\$45 per each day}& Mix cents per meal and dollars per day\\
+    3 &N&N&Y&Y\\
+    \hline
+    4 &Y&Y&Y&Y\\
+    \hline
+    5 &Y&N&Y&Y\\
 	\hline
 \end{tabular}
-\caption{Summary of tests}
+\caption{Test results}
 \label{t1}
 \end{table}
 
