@@ -7,7 +7,7 @@ This article memorializes the key lessons I learned about using OpenAI's ChatGPT
 
 # Basic setup and authentication
 
-Getting started in Python requires two steps: 1) installing the OpenAI module (pip install openai) and 2) acquiring an API key [https://platform.openai.com/account/api-keys]. In code, the API needs to be aware of the API key. It is not recommended to hardcode the key in the code itslef, and such code should never be submitted to a public repository. A simple alternative is to store the api in a local file called .env and to use the dotenv module [https://github.com/theskumar/python-dotenv] (pip install dotenv) to detect the file and load the key as an environment variable.  Figure 1 provides an example of how this can work:
+Getting started in Python requires two steps: 1) installing the OpenAI module (pip install openai) and 2) acquiring an API key [https://platform.openai.com/account/api-keys]. In code, the API needs to be aware of the API key. It is not recommended to hard code the key in the code itself, and such code should never be submitted to a public repository. A simple alternative is to store the API in a local file called .env and to use the dotenv module [https://github.com/theskumar/python-dotenv] (pip install dotenv) to detect the file and load the key as an environment variable.  Figure 1 provides an example of how this can work:
 
 [fig1.png of authentication]
 
@@ -15,7 +15,7 @@ Getting started in Python requires two steps: 1) installing the OpenAI module (p
 
 Everything is now in place to start talking to ChatGPT. The Chat Completion (https://platform.openai.com/docs/api-reference/chat/create) function creates a model response given a chat conversation. The chat conversation can be a single prompt or an entire chat history. In either case, the model parses the text and returns the most likely response. 
 
-Figure 2 shows an example helper function for obtaining the response for a single prompt. This function produces a reponse for exactly one message. Follow-up calls with different messages will be treated as different conversations.
+Figure 2 shows an example helper function for obtaining the response for a single prompt. This function produces a response for exactly one message. Follow-up calls with different messages will be treated as different conversations.
 
 [fig2.png message completion]
 
@@ -24,11 +24,11 @@ Some comments are in order.
 
  2) The 'temperature' argument controls the randomness of the response.  Allowable values are in the range [0, 2] and lower values correspond to less randomness.  Even at temperature 0, however, the model is mostly but not entirely deterministic.
 
-The chatCompletion call returns a particular kind of object (openai.openai_object.OpenAIObject) that contains the desired reponse plus additional meta data.  From the full output ('repsonse'), we want only a small piece (response.choices[0].message["content"]). Figure 3 shows the fullresponse and, at the very bottom, the desired relevant output.
+The chatCompletion call returns a particular kind of object (openai.openai_object.OpenAIObject) that contains the desired response plus additional meta data.  From the full output ('response'), we want only a small piece (response.choices[0].message["content"]). Figure 3 shows the full response and, at the very bottom, the desired relevant output.
 
 [fig 3 output example]
 
-The input prompt can be 'engineered' to maximize the utility of the single output message ("prompt engineering" [https://en.wikipedia.org/wiki/Prompt_engineering] is an emerging new skill in the application of LLMs). For example, we can tell ChatGPT to include more fields (year written, ashort summary) and to format the output as a JSON object. If we were interested in using this as a Python object, we could convert with Python's JSON utilities [https://docs.python.org/3/library/json.html].
+The input prompt can be 'engineered' to maximize the utility of the single output message ("prompt engineering" [https://en.wikipedia.org/wiki/Prompt_engineering] is an emerging new skill in the application of LLMs). For example, we can tell ChatGPT to include more fields (year written, short summary) and to format the output as a JSON object. If we were interested in using this as a Python object, we could convert with Python's JSON utilities [https://docs.python.org/3/library/json.html].
 
 [fig 4 updated output]
 
@@ -71,7 +71,7 @@ After just two iterations, the results were promising. However, prompts are idea
 [table1]
 
 For the model to pass each example, it had to choose the right option (a or b) and calculate the total annual savings in dollars. An answer that chooses the right option while getting the units wrong is only half correct.
-The total score for each prompt comes from adding the scores for the invidicual examples. The first promot (v1) scored 40% while the second prompt (v2) scored 100%! Table 2 shows the detailed scoring for each test.
+The total score for each prompt comes from adding the scores for the individual examples. The first promote (v1) scored 40% while the second prompt (v2) scored 100%! Table 2 shows the detailed scoring for each test.
 
 [table of test rests, Test, v1 option vs savings correct, v2 option vs savings correct]
 
@@ -81,7 +81,7 @@ Half of Example 1 is wrong because the output savings is not in dollars. In Exam
 
 [figure 9 of choices out of order]
 
-How is prompt V2 guiding to model to get the right answer every time? The prompt is is spurring ChatGPT to write it's own robust Python code that get's the right answer every time. At the end of the code blob (Figure 10), the model is producing is contructing a dictionary in the desired output format.
+How is prompt V2 guiding to model to get the right answer every time? The prompt is is spurring ChatGPT to write it's own robust Python code that gets the right answer every time. At the end of the code blob (Figure 10), the model is producing is constructing a dictionary in the desired output format.
 
 [possible fig 10]
 
@@ -90,7 +90,7 @@ If this prompt were included in an a user-facing app, the tests should be repeat
 {decide if any text below should be saved otherwise remove it}
 
 Introduce a few more best prompting practices:
-checking if specific conditions are met by the input, specifiying delimiter characters, and providing examples of the desired output ("few-shot prompting").
+checking if specific conditions are met by the input, specifying delimiter characters, and providing examples of the desired output ("few-shot prompting").
 Give the model time to think, e.g., by explicitly spelling out required steps and asking the model to check its own work along the way.
 
 
