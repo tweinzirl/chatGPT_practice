@@ -13,22 +13,22 @@ Getting started in Python requires two steps: 1) installing the OpenAI module (p
 
 # Your first API call
 
-Everything is now in place start talking to ChatGPT. The Chat Completion (https://platform.openai.com/docs/api-reference/chat/create) function creates a model response given a chat conversation. The chat conversation can be a single prompt or an entire chat history. In either case, the model parses the text and returns the most likely response. 
+Everything is now in place to start talking to ChatGPT. The Chat Completion (https://platform.openai.com/docs/api-reference/chat/create) function creates a model response given a chat conversation. The chat conversation can be a single prompt or an entire chat history. In either case, the model parses the text and returns the most likely response. 
 
-Figure 2 shows an example helper function for obtaining the response for a single prompt. This function produces a reponse for exactly one message. Followup calls with different messages will be treated as different conversations.
+Figure 2 shows an example helper function for obtaining the response for a single prompt. This function produces a reponse for exactly one message. Follow-up calls with different messages will be treated as different conversations.
 
 [fig2.png message completion]
 
-A few comments are in order.
- 1) The 'model' argument configures which language model to use. The GPT-3.5 model family can generate natural language and computer code. Of these, gpt-3.5-turbo is recommended as the best performance per cost ($0.002 per 1K tokens, which is approximately 750 words). The full list of models is available here [https://platform.openai.com/docs/models/overview]. 
+Some comments are in order.
+ 1) The 'model' argument configures which language model to use. The GPT-3.5 model family can generate natural language and computer code. Of these, gpt-3.5-turbo is recommended as the best performance per cost ($0.002 per 1K tokens [https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them], which is approximately 750 words). The full list of models is available here [https://platform.openai.com/docs/models/overview]. 
 
- 5) The 'temperature' argument controls the randomness of the response.  Allowable values are in the range [0, 2] and lower values correspond to less randomness.  Even at temperature 0, however, the model is mostly but not entirely deterministic.
+ 2) The 'temperature' argument controls the randomness of the response.  Allowable values are in the range [0, 2] and lower values correspond to less randomness.  Even at temperature 0, however, the model is mostly but not entirely deterministic.
 
 The chatCompletion call returns a particular kind of object (openai.openai_object.OpenAIObject) that contains the desired reponse plus additional meta data.  From the full output ('repsonse'), we want only a small piece (response.choices[0].message["content"]). Figure 3 shows the fullresponse and, at the very bottom, the desired relevant output.
 
 [fig 3 output example]
 
-The input prompt can be 'engineered' to maximize the utility of the single output message ("prompt engineering" [https://en.wikipedia.org/wiki/Prompt_engineering] is an emerging new skill in the application of LLMs). In this case, we can tell ChatGPT to include more fields (year written, ashort summary) and to format the output as a JSON object. If we were interested in using this as a Python object, we could convert with Python's built-in JSON utilities.
+The input prompt can be 'engineered' to maximize the utility of the single output message ("prompt engineering" [https://en.wikipedia.org/wiki/Prompt_engineering] is an emerging new skill in the application of LLMs). For example, we can tell ChatGPT to include more fields (year written, ashort summary) and to format the output as a JSON object. If we were interested in using this as a Python object, we could convert with Python's JSON utilities [https://docs.python.org/3/library/json.html].
 
 [fig 4 updated output]
 
@@ -40,9 +40,13 @@ The ChatGPT model is stateless. Producing coherent conversations requires that a
 
 In the above get_completion function, the user prompt is formatted into a list ('messages') of dictionaries. Each dictionary encodes one message ('content') and the source ('role'). The 'role' indicates the source of each piece of dialog. It has one of three values: 'user' (the human), 'assistant' (the chatbot), and 'system' (context for the assistant not meant to be visible to the user). A multi-message chat will retain the full history of all messages for each role.
 
-Figure 5 demonstrates to pass a multiple messages to the ChatGPT. In this case, the system role is instructing the assistant that is is to speak like Shakespeare, and that the user cannot override that style.  The user then asks to hear a joke in a different style. The model apologizes that it must stick to the specified original style and then delivers a four-line joke complete with rhyme.
+Figure 5 demonstrates passing multiple messages to the ChatGPT. In this case, the system role is instructing the assistant that is is to speak like Shakespeare, and that the user cannot override that style.  The user then asks to hear a joke in a different style. The model apologizes that it must stick to the specified original style and then delivers a four-line joke complete with rhyme.
 
 [Fig 5 input]
+
+With this in mind, it is surprisingly simple to create a chatbot within a Jupyter notebook. In the example below, I have attempted to recreate the famous Duck season versus Rabbit season debate [https://www.youtube.com/watch?v=17ocaZb-bGg] between Bugs Bunny and Daffy Duck. The assistant is Daffy Duck, and the User is Bugs Bunny. Elmer Fudd is standing by with his rifle. The chat window widget is a panel widget [https://panel.holoviz.org/FAQ.html]. Source code for the chat is here [https://github.com/tweinzirl/chatGPT_practice/blob/master/blog/chatbot_example.ipynb].
+
+[Fig 5b chatbot]
 
 # Reasoning about math word problems
 
@@ -54,7 +58,7 @@ Figure 6 shows my first attempt (V1) at a prompt for the base case (eating out c
 
 [fig 6 prompt v1]
 
-Asking the same question in a second way reveals a weakness in the prompt.  In Figure 7, I presented the cost of eating at home in units of cents ($0.01), hoping to confuse the system.  The model ends of doing the calculation in units of cents, and the output savings are quoted in cents. While this is not technically wrong, it can be considered incorrect for the purpose of standardizing the output to units of dollars.
+Asking the same question in a second way reveals a weakness in the prompt.  In Figure 7, I presented the cost of eating at home in units of cents ($0.01), hoping to confuse the system.  The model ends of doing the calculation in units of cents, and the output savings are quoted in cents. While this is not technically wrong, it can be considered incorrect since it is atypical to express amounts exceeding $1 in cents.
 
 [fig7]
 
@@ -73,11 +77,11 @@ The total score for each prompt comes from adding the scores for the invidicual 
 
 Let's examine in detail what Prompt V1 got wrong. 
 [bullet list]
-Half of Example 1 is wrong because the output savings is not in dollars. In Example 2, the letters associated with each choice are flipped, and choice (b) is listed before choice (a). ChatGPT outputs the wrong letter (a) and calculates 0 zero savings. The prompt was apparently confused by the choices not following alphabetical order. All of Example 3 is wrong because the model puts out ... code instead of numbers?  Example 4 is fully correct, and is Example 5 partial credit is awarded because the units are wrong.
+Half of Example 1 is wrong because the output savings is not in dollars. In Example 2, the letters associated with each choice are flipped, and choice (b) is listed before choice (a). ChatGPT outputs the wrong letter (a) and calculates 0 zero savings. The prompt was apparently confused by the choices not following alphabetical order. All of Example 3 is wrong because the model outputs a blob of Python code instead of numbers. Example 4 is fully correct, and is Example 5 partial credit is awarded because the units are wrong.
 
 [figure 9 of choices out of order]
 
-How is prompt V2 guiding to model to get the right answer every time? The prompt is specific? enough that it is spurring the ChatGPT to write it's own robust Python code that get's the right answer every time. At the end of the code blob (Figure 10?), the model is producing it's own JSON blob?
+How is prompt V2 guiding to model to get the right answer every time? The prompt is is spurring ChatGPT to write it's own robust Python code that get's the right answer every time. At the end of the code blob (Figure 10), the model is producing is contructing a dictionary in the desired output format.
 
 [possible fig 10]
 
@@ -95,8 +99,9 @@ Give the model time to think, e.g., by explicitly spelling out required steps an
 # Conclusion
 
 This article has demonstrated important strategies in designing prompts for ChatGPT LLMs.
-The importance of providing clear and speific structructions, giving the model the opportunity to think through explicitly defined steps, and asking for structured output were all highlighted.
-Prompt development is iterative and is best done systematically?. Testing of prompts is can be done stepwise with a collection of well-designed examples.
-Detailed responses can be graded in terms of more than one criteria, and a composite score comes from adding up the grades for each example. For prompts under active development, the tests should be re-run periodically to prevent regressions in system performance.
+Help tactics for improving prompts include providing clear and specific instructions, using delimiters (e.g., ```) to mark user input, telling the model to work through explicitly defined steps, and asking for structured output.
+Tuning applications of LLMs is very different from the process needed for other AI models.
+Prompt development is iterative and is best done in a systematic, test-driven way. Test criteria can be explicitly as shown here. It is also possible to have the LLM grade it's own response (not discussed here).
+For prompts under active development, tests should be re-run periodically to prevent regressions in system performance.
 
-Hopefully this article helps and inspires you to get started building new applications with ChatGPT!
+Hopefully this article helps and inspires you to start building new applications with ChatGPT!
