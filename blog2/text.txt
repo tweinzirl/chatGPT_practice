@@ -1,0 +1,9 @@
+In the previous post [link] about prompt engineering, I demonstrated that ChatGPT could navigate word math problems if prompted suitably. In this post, I explore ChatGPT's ability to reason about tabular data, including relational database tables.
+
+In the DeepLearning.AI short course on prompt engineering [link], a pizza order chatbot was presented. The prompt in that example (Figure 1), the menu is presented in plain text. ... implicit that ChatGPT can reason about the contents of the table... answers questions about the menu and compiles the order, including doing the math on the order cost.
+
+Suggestive that it can retrieve and summarize tablular data.
+
+Show examples for pizza prompt.
+
+Show examples where it is making things up when details are missing.
