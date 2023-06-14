@@ -8,7 +8,7 @@ Figure 2 shows an example of a complete order executed by the bot.
 
 [fig2.png - sample order]
 
-One well-known problem with chatbots, however, is their tendency to hallucinate [link?]. Asking about product details not known to the model cause it to start making up details. This is dangerous in the case of ChatGPT because the responses can sound reasonably while also being inaccurate.  In this example, the chatbot will hallucinate around product details that are not provided in the menu.
+One well-known problem with chatbots, however, is their tendency to hallucinate [link?]. Asking about product details not known to the model cause it to start making up details. This is dangerous in the case of ChatGPT because the responses can sound reasonably while also being inaccurate.  Figure 3 shows examples of hallucinations about details not provided in the pizza menu. 
 
 [fig3.png - example of water hallucination]
 
