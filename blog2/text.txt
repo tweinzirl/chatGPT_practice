@@ -1,5 +1,7 @@
 In the previous post [http://loveofdatascience.blogspot.com/2023/06/an-introduction-to-prompt-engineering.html] about prompt engineering, I demonstrated that ChatGPT could navigate word math problems if prompted suitably. In this post, I explore ChatGPT's ability to reason about tabular data, including relational database tables.
 
+# Pizza Time! (No Mushrooms Please)
+
 In the DeepLearning.AI short course on prompt engineering [https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/1/introduction], a pizza order chatbot was presented. The chatbot was able to answer questions about the menu, gather the order, and summarize the whole thing at the end, complete with the correct total price. The menu in this example was represented in plain text within a system role message (Figure 1).
 
 [fig1.png - chatbot prompt and pizza menu]
@@ -8,19 +10,32 @@ Figure 2 shows an example of a complete order executed by the bot.
 
 [fig2.png - sample order]
 
-One well-known problem with chatbots, however, is their tendency to hallucinate [link?]. Asking about product details not known to the model cause it to start making up details. This is dangerous in the case of ChatGPT because the responses can sound reasonably while also being inaccurate.  Figure 3 shows examples of hallucinations about details not provided in the pizza menu. 
+One well-known problem with chatbots, however, is their tendency to hallucinate [link?]. Asking about product details not known to the model cause it to start making up details. This is dangerous in the case of ChatGPT because the responses are often reasonable while also being inaccurate. Figure 3 shows examples of hallucinations about details not provided in the pizza menu. 
 
 [fig3.png - example of water hallucination]
 
 Fixable by specifying (12 ounce...) but problem still exists.
 
-The errors in these specific examples can be addressed by editing the system role prompt with e.g., the actual size of the bottled water. However, fortifying such a menu with every possible detail that might be asked would dramatically increase the size of the prompt. ChatGPT usage fees are based on the number of text tokens the model needs to process, so this will become expensive and is not necessarily fool proof.
+The errors in these specific examples can be addressed by adding details (diameters of pizzas, sizes of drinks) to text menue. Fool-proofing the menu would be an iterative process that might cause regressions as menu complexity increases. It would also not be cost effective since ChatGPT usage fees are based on the number of text tokens uploaded.
+
+# Next section
 
 One way to make tabular data query more reliable...
+
+[need to introduce langchain, mention capabilities with prompts and chains, db connections, ]
+
+First try, which failed, make one big table analogous to what is in the above prompt (Figure 1). Having Item Name and Type in one table is confusing because it queries Type for input item name.
+
+Second try, separate items into tables per each type (pizzas, toppings, sides, drinks). Same schema (Item, Price large, Price medium, Price small). seems better. Bottled Water query worked. Number of pizzas and prices query worked.  Other examples?
+
+This is for a single isolated query. Not a chatbot with message history. Not sure how to do that.
+
+Discuss if model needs to see the data or not, and would this affect the output answers? direct=False?  This is concern for sensitive data. Hosting a model on premise could alleviate the issue so that no data ever gets out.
 
 [examine if langchain db query of a more structured table is more robust. prototype table, have chatgpt write the query, then stuff the query results back into the prompt for the model to compose an answer to, as in the building systems example; difference here is that langchain db query is being used]
 
 That the chatbot can reason in such detail about the menu, which is essentially a simple table, suggests the potential for reasoning about more complex table or database of tables. 
+
 
 
 Does using real relational database tables somehow alleviate the hallucination problem? Does heavily structuring the data prevent wrong details from being made up, e.g., because the answer must be expressable as a valid sql query?
