@@ -26,6 +26,20 @@ One way to make tabular data query more reliable...
 
 First try, which failed, make one big table analogous to what is in the above prompt (Figure 1). Having Item Name and Type in one table is confusing because it queries Type for input item name.
 
+ questions to test:
+  - How many sizes of pizza do you have?  Name them.
+  - What drinks can I order?
+  - Please tell me how many sizes of bottled water \
+                       you have. Do you know how big they are?
+  - Are your mushrooms hallucinogenic?
+  - What is the cost of a cheese pizza with sausage?
+  - What is the price of a cheese pizza topped with sausage and mushroom?
+     -- produces result but addings price of same topping twice to reach the wrong conclusion; data must not be in the best possible format. Would a better structure of the data make this foolproof?
+     -- Repeating with a SQLDatabaseSequentialChain seems to produce correct answer for "What is the price of a small pizza topped with both sausage and mushroom?"
+  - What is the diameter of each pizza size?
+    -- the sequential chain knew that diameter was not provided, and it did not hallucinate any details.
+    -- db chain made something up but then said this information is not available in the tables
+
 Second try, separate items into tables per each type (pizzas, toppings, sides, drinks). Same schema (Item, Price large, Price medium, Price small). seems better. Bottled Water query worked. Number of pizzas and prices query worked.  Other examples?
 
 This is for a single isolated query. Not a chatbot with message history. Not sure how to do that.
@@ -33,6 +47,10 @@ This is for a single isolated query. Not a chatbot with message history. Not sur
 Discuss if model needs to see the data or not, and would this affect the output answers? direct=False?  This is concern for sensitive data. Hosting a model on premise could alleviate the issue so that no data ever gets out.
 
 [examine if langchain db query of a more structured table is more robust. prototype table, have chatgpt write the query, then stuff the query results back into the prompt for the model to compose an answer to, as in the building systems example; difference here is that langchain db query is being used]
+
+Agent feature in LangChain is one of the newer and most powerful features to the library. LLM as reasoning engine instead of just a Q&A tool.
+
+LLM assisted QnA evaluation?  Example of using the LLM to help evaluate.  New process. Exciting times.
 
 That the chatbot can reason in such detail about the menu, which is essentially a simple table, suggests the potential for reasoning about more complex table or database of tables. 
 
@@ -45,3 +63,5 @@ Suggestive that it can retrieve and summarize tablular data.
 Show examples for pizza prompt.
 
 Show examples where it is making things up when details are missing.
+
+
