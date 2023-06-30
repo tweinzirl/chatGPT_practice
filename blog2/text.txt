@@ -49,50 +49,23 @@ As impressive as the above results are, the LLM can fool itself on seemingly sim
 
 [fig7 - confusion about pizza diameter]
 
- This demonstrates a brittleness in the text-to-SQL capabilities of ChatGPT.
+As a final example, I ask about the size of a small cheese pizza topped with mushroom and sausage. The chain manages to join the <it>pizzas</it> and <it>toppings</it> tables together in a way that returns 0 rows (Figure 8). This is disappointing since the original chatbot with the text menu could answer such a question. Potential ways to fix this text-to-SQL brittleness via prompt engineering include customizing the prompt https://python.langchain.com/docs/modules/chains/popular/sqlite#customize-prompt instructions or including example rows in the prompt https://python.langchain.com/docs/modules/chains/popular/sqlite#adding-example-rows-from-each-table.
 
-[expect db chain to perform at least as well as previous implementation based on the text-based menu. So check if the three hallucination examples are improved. Then try other more complicated examples to show off. comment that SQLDatabaseSequentialChain adds extra layer where the right tables to check are first examined.]
+[fig8 - wrong pizza price query]
 
-[need to introduce langchain, mention capabilities with prompts and chains, db connections, ]
+In this case, I tried out the SQLDatabaseSequentialChain https://python.langchain.com/docs/modules/chains/popular/sqlite#sqldatabasesequentialchain which first examines the schema to decide which tables are relevant and then calls the SQLDatabaseChain for the relevant tables. The result is correct and is shown in Figure 9. Without completely understanding why this works, I speculate the LLM is able to write more relevant SQL after examining the table schemas.
 
-First try, which failed, make one big table analogous to what is in the above prompt (Figure 1). Having Item Name and Type in one table is confusing because it queries Type for input item name.
+[fig9 - correct pizza price query.]
 
- questions to test:
-  - How many sizes of pizza do you have?  Name them.
-  - What drinks can I order?
-  - Please tell me how many sizes of bottled water \
-                       you have. Do you know how big they are?
-  - Are your mushrooms hallucinogenic?
-  - What is the cost of a cheese pizza with sausage?
-  - What is the price of a cheese pizza topped with sausage and mushroom?
-     -- produces result but addings price of same topping twice to reach the wrong conclusion; data must not be in the best possible format. Would a better structure of the data make this foolproof?
-     -- Repeating with a SQLDatabaseSequentialChain seems to produce correct answer for "What is the price of a small pizza topped with both sausage and mushroom?"
-  - What is the diameter of each pizza size?
-    -- the sequential chain knew that diameter was not provided, and it did not hallucinate any details.
-    -- db chain made something up but then said this information is not available in the tables
+# Section 3 - PizzaBot Agent Based on SQL
 
-Second try, separate items into tables per each type (pizzas, toppings, sides, drinks). Same schema (Item, Price large, Price medium, Price small). seems better. Bottled Water query worked. Number of pizzas and prices query worked.  Other examples?
+Using the lessons learned above, I now assemble an pizza ordering agent that provides menu information based off a SQL database.
 
-This is for a single isolated query. Not a chatbot with message history. Not sure how to do that.
+Explain LangChain Agents https://python.langchain.com/docs/modules/agents/ and how they have access to tools https://python.langchain.com/docs/modules/agents/tools/.
 
-Discuss if model needs to see the data or not, and would this affect the output answers? direct=False?  This is concern for sensitive data. Hosting a model on premise could alleviate the issue so that no data ever gets out.
-
-[examine if langchain db query of a more structured table is more robust. prototype table, have chatgpt write the query, then stuff the query results back into the prompt for the model to compose an answer to, as in the building systems example; difference here is that langchain db query is being used]
-
-Agent feature in LangChain is one of the newer and most powerful features to the library. LLM as reasoning engine instead of just a Q&A tool.
-
-LLM assisted QnA evaluation?  Example of using the LLM to help evaluate.  New process. Exciting times.
-
-That the chatbot can reason in such detail about the menu, which is essentially a simple table, suggests the potential for reasoning about more complex table or database of tables. 
-
-
-
-Does using real relational database tables somehow alleviate the hallucination problem? Does heavily structuring the data prevent wrong details from being made up, e.g., because the answer must be expressable as a valid sql query?
-
-Suggestive that it can retrieve and summarize tablular data.
-
-Show examples for pizza prompt.
-
-Show examples where it is making things up when details are missing.
+Summarize the goal here:
+ - take the order like the original text agent did, referencing the SQL db when needed
+ - summarize the order at the end
+ - email a summary of the order to the user
 
 
