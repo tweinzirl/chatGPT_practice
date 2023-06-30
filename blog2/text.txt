@@ -1,8 +1,8 @@
-In the previous post [http://loveofdatascience.blogspot.com/2023/06/an-introduction-to-prompt-engineering.html] about prompt engineering, I demonstrated that ChatGPT could navigate word math problems if prompted suitably. In this post, I explore ChatGPT's ability to reason about tabular data, including relational database tables.
+In the previous post http://loveofdatascience.blogspot.com/2023/06/an-introduction-to-prompt-engineering.html about prompt engineering for large language models (LLMs), I demonstrated that ChatGPT could navigate word math problems if prompted suitably. In this post, I explore ChatGPT's ability to reason about tabular data, including relational database tables.
 
 # Pizza Time! (No Mushrooms Please)
 
-In the DeepLearning.AI short course on prompt engineering [https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/1/introduction], a pizza order chatbot was presented. The chatbot was able to answer questions about the menu, gather the order, and summarize the whole thing at the end, complete with the correct total price. The menu in this example was represented in plain text within a system role message (Figure 1).
+The DeepLearning.AI short course on prompt engineering https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/1/introduction culminates with the demo of a pizza order chatbot. The chatbot is able to answer questions about the menu, gather the order, and summarize the whole thing at the end, complete with the correct total price. The menu in this example is represented in plain text within a system role message (Figure 1).
 
 [fig1.png - chatbot prompt and pizza menu]
 
@@ -10,15 +10,28 @@ Figure 2 shows an example of a complete order executed by the bot.
 
 [fig2.png - sample order]
 
-One well-known problem with chatbots, however, is their tendency to hallucinate [link?]. Asking about product details not known to the model cause it to start making up details. This is dangerous in the case of ChatGPT because the responses are often reasonable while also being inaccurate. Figure 3 shows examples of hallucinations about details not provided in the pizza menu. 
+One well-known problem with LLMs, however, is their tendency to hallucinate https://machinelearningmastery.com/a-gentle-introduction-to-hallucinations-in-large-language-models. Asking about product details not known to the model cause it to start making up details. This is generally dangerous because even LLM inaccurate responses can sound reasonable. Figure 3 shows examples of hallucinations about details not provided in the pizza menu. 
 
 [fig3.png - example of water hallucination]
 
-Fixable by specifying (12 ounce...) but problem still exists.
+The errors in these specific examples are fixable by adding more details (diameters of pizzas, sizes of drinks) to the menu text in the prompt. Fool-proofing the menu would be an iterative process that could potentially cause regressions as menu complexity increases.
 
-The errors in these specific examples can be addressed by adding details (diameters of pizzas, sizes of drinks) to text menue. Fool-proofing the menu would be an iterative process that might cause regressions as menu complexity increases. It would also not be cost effective since ChatGPT usage fees are based on the number of text tokens uploaded.
 
-# Next section
+# Querying structured data
+
+In the above example, ChatGPT was able to reason about the menu surprisingly well. Here, I explore if hallucinations are reduced when the menu is structured in SQL tables instead of unstructured text. I hypothesize that well-chosen table name and column names would be used as metadata to help the LLM understand how and whether to answer a given question.
+
+To set up the database, dataframes were made for each each category of item (pizza, topping, side item, drink). They were first prototyped as pandas dataframes and then loaded into a SQLite https://www.sqlite.org/index.html database with SQLAlchemy https://www.sqlalchemy.org/. The table schemas consist of the item name, price, and item description. Figure 4 shows the full content of the tables.
+
+[Figure 4 - Pizza menu]
+
+[intro to langchain and how to set up chain]
+
+LangChain [https://python.langchain.com/docs/get_started/introduction.html] is an exciting new project that helps integrate LLMs into new applications. LangChain provides components for connecting LLMs to data sources and accomplishing higher level tasks (such as Q&A sessions).
+
+https://blog.langchain.dev/llms-and-sql/ - include link as example db in langchain, or link to actual docs with newer examples ...
+
+[expect db chain to perform at least as well as previous implementation based on the text-based menu. So check if the three hallucination examples are improved. Then try other more complicated examples to show off. comment that SQLDatabaseSequentialChain adds extra layer where the right tables to check are first examined.]
 
 One way to make tabular data query more reliable...
 
