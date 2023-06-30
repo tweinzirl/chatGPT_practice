@@ -29,15 +29,29 @@ To set up the database, dataframes were made for each each category of item (piz
 
 ChatGPT was connected to the database via LangChain https://python.langchain.com/docs/get_started/introduction.html , an exciting new project that provides components for a) connecting LLMs to external data sources and b) accomplishing higher level tasks like as Q&A sessions.
 
-LangChain provides a SQLDatabaseChain... [talk about constructing the chain from an llm and the conencted database]. LangChain has adopted published best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries. After experimenting with my own prompt, I adopted the default prompt.  The process for setting up the database chain as well as the default prompt are shown in Figure 5.
+LangChain provides a SQLDatabaseChain component https://python.langchain.com/docs/modules/chains/popular/sqlite that is pre-configured to query data in any database that is compatible with SQLAlchemy. The tool implements established best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries, although futher customization of the prompt is possible. The minimal steps for setting up the SQLDatabaseChain include connecting to the database and initializing an LLM https://python.langchain.com/docs/modules/model_io/models/ (Figure 5).  After experimenting with my own prompt, I adopted the default prompt.
 
 [fig5 - set up db chain and view custom prompt]
 
-https://blog.langchain.dev/llms-and-sql/ - include link as example db in langchain, or link to actual docs with newer examples ...
+I expect the SQL chain to perform at least as well as the previous implementation, so I start by presenting the three inputs that caused hallucinations in Figure 3. Thankfully [!], the SQL chain answers all the questions correctly and without hallucinating false details. Figure 6 shows the results. Some of the output remarks (e.g., "The sizes and their corresponding dimensions are not provided in the database.") are not necessarily things that should be shown to end users, and instructing the model to use a different tone would be worthwhile.
+
+[fig6 - three examples of prior hallucinations fixed]
+
+Some comments are in order: [bullet list]
+
+These examples demonstrate the ability of the LLM to examine the data schema and write the SQL needed to efficiently solve the problem. In the first example (how many sizes of pizza and how big they are), the LLM inferred from the Price_Large, Price_Medium, and Price_Small fields that there the three pizza sizes are Large, Medium, and Small. It did not confuse the prices as measurements of size, and it correctly stated that information of dimensions is not available.
+
+In the second example (number and sizes of bottled water), the LLM found only one row and read from the description that the size is 20 ounces. The Price_Medium and Price_Small columns where NULL, but it is not clear this was used in the answer. Asking a related question on the number, size, and cost of Coke returns a detailed and correct answer, which suggests the LLM did not find the answer by accident.
+
+In the third case (Greek salad as a topping), the LLM joined the <it>pizzas</it> and <it>toppings</it> tables together, found no rows where 'Greek salad' was a topping, and concluded it was not possible
+
+As impressive as the above results are, the LLM can fool itself on seemingly simple questions. When asked simply about the diameters of pizza size (which was answered correctly above as part of a longer question), the LLM confuses the price values for pizza dimensions. When asked a second time and reminded that the price values are dollars and not dimensions, it correctly reports that it cannot answer the question.
+
+[fig7 - confusion about pizza diameter]
+
+ This demonstrates a brittleness in the text-to-SQL capabilities of ChatGPT.
 
 [expect db chain to perform at least as well as previous implementation based on the text-based menu. So check if the three hallucination examples are improved. Then try other more complicated examples to show off. comment that SQLDatabaseSequentialChain adds extra layer where the right tables to check are first examined.]
-
-One way to make tabular data query more reliable...
 
 [need to introduce langchain, mention capabilities with prompts and chains, db connections, ]
 
