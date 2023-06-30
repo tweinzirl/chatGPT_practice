@@ -1,4 +1,4 @@
-In the previous post http://loveofdatascience.blogspot.com/2023/06/an-introduction-to-prompt-engineering.html about prompt engineering for large language models (LLMs), I demonstrated that ChatGPT could navigate word math problems if prompted suitably. In this post, I explore ChatGPT's ability to reason about tabular data, including relational database tables.
+In the previous post http://loveofdatascience.blogspot.com/2023/06/an-introduction-to-prompt-engineering.html about prompt engineering for large language models (LLMs), I demonstrated that ChatGPT could navigate word math problems if prompted suitably. In this post, I explore ChatGPT's ability to reason about tabular data, including relational database tables. The source code and raw materials used to build this article are available here https://github.com/tweinzirl/chatGPT_practice/tree/master/blog2 .
 
 # Pizza Time! (No Mushrooms Please)
 
@@ -27,7 +27,11 @@ To set up the database, dataframes were made for each each category of item (piz
 
 [intro to langchain and how to set up chain]
 
-LangChain [https://python.langchain.com/docs/get_started/introduction.html] is an exciting new project that helps integrate LLMs into new applications. LangChain provides components for connecting LLMs to data sources and accomplishing higher level tasks (such as Q&A sessions).
+ChatGPT was connected to the database via LangChain https://python.langchain.com/docs/get_started/introduction.html , an exciting new project that provides components for a) connecting LLMs to external data sources and b) accomplishing higher level tasks like as Q&A sessions.
+
+LangChain provides a SQLDatabaseChain... [talk about constructing the chain from an llm and the conencted database]. LangChain has adopted published best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries. After experimenting with my own prompt, I adopted the default prompt.  The process for setting up the database chain as well as the default prompt are shown in Figure 5.
+
+[fig5 - set up db chain and view custom prompt]
 
 https://blog.langchain.dev/llms-and-sql/ - include link as example db in langchain, or link to actual docs with newer examples ...
 
