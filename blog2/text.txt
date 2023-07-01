@@ -10,7 +10,7 @@ Figure 2 shows an example of a complete order executed by the bot.
 
 [fig2.png - sample order]
 
-One well-known problem with LLMs, however, is their tendency to hallucinate https://machinelearningmastery.com/a-gentle-introduction-to-hallucinations-in-large-language-models. Asking about product details not known to the model cause it to start making up details. This is generally dangerous because even LLM inaccurate responses can sound reasonable. Figure 3 shows examples of hallucinations about details not provided in the pizza menu. 
+One well-known problem with LLMs, however, is their tendency to hallucinate https://machinelearningmastery.com/a-gentle-introduction-to-hallucinations-in-large-language-models. Asking about details not provided in the prompt causes the model make up details based on its original training. This can be dangerous in production applications because even LLM inaccurate responses can sound reasonable. Figure 3 shows examples of hallucinations about details not provided in the pizza menu. 
 
 [fig3.png - example of water hallucination]
 
@@ -19,41 +19,45 @@ The errors in these specific examples are fixable by adding more details (diamet
 
 # Querying structured data
 
-In the above example, ChatGPT was able to reason about the menu surprisingly well. Here, I explore if hallucinations are reduced when the menu is structured in SQL tables instead of unstructured text. I hypothesize that well-chosen table name and column names would be used as metadata to help the LLM understand how and whether to answer a given question.
+In the above example, ChatGPT was able to reason about the menu surprisingly well. Here, I explore if hallucinations are reduced when the menu is structured in SQL tables instead of unstructured text. I hypothesize that well-chosen table and column names would be used as metadata to help the LLM understand how and whether to answer a given question.
 
 To set up the database, dataframes were made for each each category of item (pizza, topping, side item, drink). They were first prototyped as pandas dataframes and then loaded into a SQLite https://www.sqlite.org/index.html database with SQLAlchemy https://www.sqlalchemy.org/. The table schemas consist of the item name, price, and item description. Figure 4 shows the full content of the tables.
 
 [Figure 4 - Pizza menu]
 
-[intro to langchain and how to set up chain]
-
 ChatGPT was connected to the database via LangChain https://python.langchain.com/docs/get_started/introduction.html , an exciting new project that provides components for a) connecting LLMs to external data sources and b) accomplishing higher level tasks like as Q&A sessions.
 
-LangChain provides a SQLDatabaseChain component https://python.langchain.com/docs/modules/chains/popular/sqlite that is pre-configured to query data in any database that is compatible with SQLAlchemy. The tool implements established best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries, although futher customization of the prompt is possible. The minimal steps for setting up the SQLDatabaseChain include connecting to the database and initializing an LLM https://python.langchain.com/docs/modules/model_io/models/ (Figure 5).  After experimenting with my own prompt, I adopted the default prompt.
+LangChain provides a SQLDatabaseChain component https://python.langchain.com/docs/modules/chains/popular/sqlite that is pre-configured to query data in any database compatible with SQLAlchemy. The tool implements established best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries, although futher customization of the prompt is possible. The minimal steps for setting up the SQLDatabaseChain include connecting to the database and initializing an LLM https://python.langchain.com/docs/modules/model_io/models/ (Figure 5).  After experimenting with my own prompt, I adopted the default prompt.
 
 [fig5 - set up db chain and view custom prompt]
 
-I expect the SQL chain to perform at least as well as the previous implementation, so I start by presenting the three inputs that caused hallucinations in Figure 3. Thankfully [!], the SQL chain answers all the questions correctly and without hallucinating false details. Figure 6 shows the results. Some of the output remarks (e.g., "The sizes and their corresponding dimensions are not provided in the database.") are not necessarily things that should be shown to end users, and instructing the model to use a different tone would be worthwhile.
+I expect the SQL chain to perform at least as well as the previous implementation, so I start by presenting the three inputs that caused hallucinations in Figure 3. Impressively, the SQL chain answers all the questions correctly and without hallucinating false details. Figure 6 shows the results. Some of the output remarks (e.g., "The sizes and their corresponding dimensions are not provided in the database.") are not necessarily things that should be shown to end users, and prompting the model to use a different tone would be worthwhile.
 
 [fig6 - three examples of prior hallucinations fixed]
 
 Some comments are in order: [bullet list]
 
-These examples demonstrate the ability of the LLM to examine the data schema and write the SQL needed to efficiently solve the problem. In the first example (how many sizes of pizza and how big they are), the LLM inferred from the Price_Large, Price_Medium, and Price_Small fields that there the three pizza sizes are Large, Medium, and Small. It did not confuse the prices as measurements of size, and it correctly stated that information of dimensions is not available.
+
+These examples demonstrate the ability of the LLM to examine the data schema and write the SQL needed to efficiently solve the problem. In each case, the SQL chain is following the process specified in the prompt: identify the question, write the SQL query, get the query output, formulate the final answer.
+
+/bullet
+In the first example (how many sizes of pizza and how big they are), the LLM inferred from the Price_Large, Price_Medium, and Price_Small fields that there the three pizza sizes are Large, Medium, and Small. It did not confuse the prices as measurements of size (although, see below where this does happen), and it correctly stated that information of dimensions is not available.
 
 In the second example (number and sizes of bottled water), the LLM found only one row and read from the description that the size is 20 ounces. The Price_Medium and Price_Small columns where NULL, but it is not clear this was used in the answer. Asking a related question on the number, size, and cost of Coke returns a detailed and correct answer, which suggests the LLM did not find the answer by accident.
 
-In the third case (Greek salad as a topping), the LLM joined the <it>pizzas</it> and <it>toppings</it> tables together, found no rows where 'Greek salad' was a topping, and concluded it was not possible
+In the third case (Greek salad as a topping), the LLM joined the <it>pizzas</it> and <it>toppings</it> tables together, found no rows where 'Greek salad' was a topping, and concluded it was not possible.
+
+/bullet
 
 As impressive as the above results are, the LLM can fool itself on seemingly simple questions. When asked simply about the diameters of pizza size (which was answered correctly above as part of a longer question), the LLM confuses the price values for pizza dimensions. When asked a second time and reminded that the price values are dollars and not dimensions, it correctly reports that it cannot answer the question.
 
 [fig7 - confusion about pizza diameter]
 
-As a final example, I ask about the size of a small cheese pizza topped with mushroom and sausage. The chain manages to join the <it>pizzas</it> and <it>toppings</it> tables together in a way that returns 0 rows (Figure 8). This is disappointing since the original chatbot with the text menu could answer such a question. Potential ways to fix this text-to-SQL brittleness via prompt engineering include customizing the prompt https://python.langchain.com/docs/modules/chains/popular/sqlite#customize-prompt instructions or including example rows in the prompt https://python.langchain.com/docs/modules/chains/popular/sqlite#adding-example-rows-from-each-table.
+As a final example, I ask about the size of a small cheese pizza topped with mushroom and sausage. The chain manages to join the <it>pizzas</it> and <it>toppings</it> tables together in a way that returns 0 rows (Figure 8). This is disappointing since the original chatbot with the text menu could answer such a question. Non-invasive ways to fix this text-to-SQL brittleness customizing the prompt instructions https://python.langchain.com/docs/modules/chains/popular/sqlite#customize-prompt instructions and/or including sample rows in the prompt https://python.langchain.com/docs/modules/chains/popular/sqlite#adding-example-rows-from-each-table.
 
 [fig8 - wrong pizza price query]
 
-In this case, I tried out the SQLDatabaseSequentialChain https://python.langchain.com/docs/modules/chains/popular/sqlite#sqldatabasesequentialchain which first examines the schema to decide which tables are relevant and then calls the SQLDatabaseChain for the relevant tables. The result is correct and is shown in Figure 9. Without completely understanding why this works, I speculate the LLM is able to write more relevant SQL after examining the table schemas.
+In this case, I tried out the SQLDatabaseSequentialChain https://python.langchain.com/docs/modules/chains/popular/sqlite#sqldatabasesequentialchain which first examines the schema to decide which tables are relevant and then calls the SQLDatabaseChain for the relevant tables. The result is correct and is shown in Figure 9. The better outcome is not a fluke. The sequential chain consistently outperforms the simpler chain in repeat trials. It might be that the sequential chain is giving the LLM a more detailed examination of the table schemas, so that it is able to write more relevant SQL.
 
 [fig9 - correct pizza price query.]
 
