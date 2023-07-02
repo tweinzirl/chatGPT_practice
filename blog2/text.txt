@@ -72,4 +72,5 @@ Summarize the goal here:
  - summarize the order at the end
  - email a summary of the order to the user
 
-
+final email summary:
+[orderBot_receipt.png]
