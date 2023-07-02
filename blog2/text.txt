@@ -63,10 +63,12 @@ In this case, I tried out the SQLDatabaseSequentialChain https://python.langchai
 
 # Better Ingredients, Better PizzaBot
 
-Using the lessons learned above, I now assemble a custom pizza OrderBot that resolves the shortcomings around hallucinations that were shared above. In addition to working from a database representation of the pizza menu (Figure 4), I would like the bot to be able to send a summary of the order to the user's email.
-Referencing detailed examples (especially this one https://python.langchain.com/docs/modules/agents/how_to/sharedmemory_for_tools) from langchain's documentation, I was able prototype the desired functionality.
+Using the lessons learned above, I now assemble a custom pizza OrderBot that resolves the shortcomings around hallucinations that were shared above. In addition to working from a database representation of the pizza menu (Figure 4), I would like the bot to be able to send a summary of the order to the user's email. The bot will have to converse with the user in real time and know when to acccess tools for searching the database and sending the summary email.
 
-The final solution https://github.com/tweinzirl/chatGPT_practice/blob/master/blog2/pizza_agent_v2.ipynb consists of the following components:
+The langchain Agent interface is able to select which, if any, of the available tools should be called based on the user input. 
+Referencing detailed examples (especially this one https://python.langchain.com/docs/modules/agents/how_to/sharedmemory_for_tools) from langchain's documentation, I was able prototype the desired functionality in my own customized agent.
+
+The final solution https://github.com/tweinzirl/chatGPT_practice/blob/master/blog2/pizza_agent_v2.ipynb consists of the following components, which are customized separately before integration:
 \bullet
  - A conversational agent (langchain.agents.ConversationalAgent https://python.langchain.com/docs/modules/agents/agent_types/chat_conversation_agent.html) with a custom prompt spelling out its role as an OrderBot.
  - Conversation memory https://python.langchain.com/docs/modules/memory/ buffers (langchain.memory.ConversationBufferMemory, langchain.memory.ReadOnlySharedMemory)
@@ -76,15 +78,26 @@ The final solution https://github.com/tweinzirl/chatGPT_practice/blob/master/blo
  - An underlying LLM (gpt-3.5-turbo)
 \bullet
 
-The components are instantiated and customisted separately before being combined.
+The separate tools (for database search, order summary, and sending the email) were separately defined.  The order summary tool is just an LLMChain with a custom prompt. Given the chat history (via an instance of ReadOnlySharedMemory), it will summarize the name and price of each item, as well as the total price. The code for the this tool (order_summary) is shown in Figure 10.
 
-[discuss prompts and show fig]
+[fig10.png - LLM chain for order summary]
 
-[discuss tools and show fig]
+The tools setup as a list of langchain.agent.Tool objects. Each Tool object knows its own name (e.g., 'Menu Search'), what function it points to, and has a text description the LLM parses when deciding which tool to call. Figure 11 shows the final configuration of the tools. Note the Order Summary tool additionally has the return_direct=True parameter, which returns the output of the tool directly to the agent (otherwise the LLM would read and rephrase the order summary).
 
-[possibly show email function taking order summary and recipient email as the inputs]
+[fig11.png - tool configuration]
 
-The final agent comes from bringing the components together in the langchain.agents.AgentExecutor.from_agent_and_tools function.
+The Send Email tool (Figure 12) is the most interesting. I specify in the description that the input is one pipe-delimited string containing the order summary text and the user's email. The send_message function then parses the substrings before it formats the email.
+
+[fig12.png - send_message function]
+
+To make the OrderBot more self-aware about its role in the pizza ordering process, the ConversationalAgent's prompt needs to be edited. This prompt is detailed an includes a prefix, a description of available tools, and a suffix. I use the prefix to explain the OrderBot;s function. The tool list is automatically populated from the existing list of tools. The suffix has placefholders for the chat history, user input, and a scratchpad for the agent to compose a response. Figure 13 shows the code for updating the prompt while Figure 14 shows the fully formatted prompt template.
+
+[fig13 - customize the agent prompt]
+
+[fig14 - final agent prompt template]
+
+
+The final agent comes from bringing the components together in the langchain.agents.AgentExecutor.from_agent_and_tools method.
 
 [figure]
 
@@ -99,3 +112,5 @@ final email summary:
 Summary:
 
 In this article, have explored the ability
+
+Note this article was produced with langchain 0.0.220 and ChatGPT gpt-3.5-turbo-0301.
