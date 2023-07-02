@@ -61,7 +61,7 @@ In this case, I tried out the SQLDatabaseSequentialChain https://python.langchai
 
 [fig9 - correct pizza price query.]
 
-# Section 3 - PizzaBot Agent Based on SQL
+# Section 3 - Better Ingredients, Better PizzaBot
 
 Using the lessons learned above, I now assemble an pizza ordering agent that provides menu information based off a SQL database.
 
