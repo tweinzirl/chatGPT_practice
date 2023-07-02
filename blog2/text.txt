@@ -2,7 +2,7 @@ In the previous post http://loveofdatascience.blogspot.com/2023/06/an-introducti
 
 # Pizza Time! (No Mushrooms Please)
 
-The DeepLearning.AI short course on prompt engineering https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/1/introduction culminates with the demo of a pizza order chatbot. The chatbot is able to answer questions about the menu, gather the order, and summarize the whole thing at the end, complete with the correct total price. The menu in this example is represented in plain text within a system role message (Figure 1).
+The DeepLearning.AI short course on prompt engineering https://learn.deeplearning.ai/chatgpt-prompt-eng/lesson/1/introduction culminates with the demo of a pizza OrderBot. The bot is able to answer questions about the menu, gather the order, and summarize the whole thing at the end, complete with the correct total price. The menu in this example is represented in plain text within a system role message (Figure 1).
 
 [fig1.png - chatbot prompt and pizza menu]
 
@@ -25,7 +25,7 @@ To set up the database, dataframes were made for each each category of item (piz
 
 [Figure 4 - Pizza menu]
 
-ChatGPT was connected to the database via LangChain https://python.langchain.com/docs/get_started/introduction.html , an exciting new project that provides components for a) connecting LLMs to external data sources and b) accomplishing higher level tasks like as Q&A sessions.
+ChatGPT was connected to the database via LangChain https://python.langchain.com/docs/get_started/introduction.html , an exciting new open source framework for incorporating LLMs into applications. The project that provides modular components for a) connecting LLMs to external data sources and b) accomplishing higher level tasks like as Q&A sessions. The components can be chained together to create arbitrarily complex applications. The short, and currently free, langchain course https://learn.deeplearning.ai/langchain/lesson/1/introduction from deeplearning.ai https://www.deeplearning.ai provides an accessible introduction to the package.
 
 LangChain provides a SQLDatabaseChain component https://python.langchain.com/docs/modules/chains/popular/sqlite that is pre-configured to query data in any database compatible with SQLAlchemy. The tool implements established best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries, although futher customization of the prompt is possible. The minimal steps for setting up the SQLDatabaseChain include connecting to the database and initializing an LLM https://python.langchain.com/docs/modules/model_io/models/ (Figure 5).  After experimenting with my own prompt, I adopted the default prompt.
 
@@ -61,16 +61,34 @@ In this case, I tried out the SQLDatabaseSequentialChain https://python.langchai
 
 [fig9 - correct pizza price query.]
 
-# Section 3 - Better Ingredients, Better PizzaBot
+# Better Ingredients, Better PizzaBot
 
-Using the lessons learned above, I now assemble an pizza ordering agent that provides menu information based off a SQL database.
+Using the lessons learned above, I now assemble a custom pizza OrderBot that resolves the shortcomings around hallucinations that were shared above. In addition to working from a database representation of the pizza menu (Figure 4), I would like the bot to be able to send a summary of the order to the user's email.
+Referencing detailed examples (especially this one https://python.langchain.com/docs/modules/agents/how_to/sharedmemory_for_tools) from langchain's documentation, I was able prototype the desired functionality.
 
-Explain LangChain Agents https://python.langchain.com/docs/modules/agents/ and how they have access to tools https://python.langchain.com/docs/modules/agents/tools/.
+The final solution https://github.com/tweinzirl/chatGPT_practice/blob/master/blog2/pizza_agent_v2.ipynb consists of the following components:
+\bullet
+ - A conversational agent (langchain.agents.ConversationalAgent https://python.langchain.com/docs/modules/agents/agent_types/chat_conversation_agent.html) with a custom prompt spelling out its role as an OrderBot.
+ - Conversation memory https://python.langchain.com/docs/modules/memory/ buffers (langchain.memory.ConversationBufferMemory, langchain.memory.ReadOnlySharedMemory)
+ - SQLDatabaseChain for querying the pizza database (see the above implementation for details)
+ - An LLMChain https://python.langchain.com/docs/modules/chains/foundational/llm_chain . This cain is specifically prompted to summarize the order given the conversation history (ReadOnlyShareMemory)
+ - A Custom email function: input is a single pipe-delimited string containing order summary and recipient email address
+ - An underlying LLM (gpt-3.5-turbo)
+\bullet
 
-Summarize the goal here:
- - take the order like the original text agent did, referencing the SQL db when needed
- - summarize the order at the end
- - email a summary of the order to the user
+The components are instantiated and customisted separately before being combined.
+
+[discuss prompts and show fig]
+
+[discuss tools and show fig]
+
+[possibly show email function taking order summary and recipient email as the inputs]
+
+The final agent comes from bringing the components together in the langchain.agents.AgentExecutor.from_agent_and_tools function.
+
+[figure]
+
+Then show the conversation history. The OrderBot was upbeat, friendly, and addressed me by name. The order summary was emailed to the correct address without problem.
 
 conversation summary:
 [conversation_summary.png]
@@ -78,4 +96,6 @@ conversation summary:
 final email summary:
 [orderBot_receipt.png]
 
+Summary:
 
+In this article, have explored the ability
