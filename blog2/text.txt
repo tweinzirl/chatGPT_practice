@@ -96,21 +96,20 @@ To make the OrderBot more self-aware about its role in the pizza ordering proces
 
 [fig14 - final agent prompt template]
 
+As shown in Figure 15, the final agent chain (agent_chain) comes from bringing the components together in the langchain.agents.AgentExecutor.from_agent_and_tools method. Note, custom agent (agent) gets the custom prompt (agent_prompt) by way of an LLMChain. To prevent any parsing errors from causing a problem, the agent_chain.handle_parsing_errors parameter is set to True.
 
-The final agent comes from bringing the components together in the langchain.agents.AgentExecutor.from_agent_and_tools method.
+[fig15 - combining all the pieces for the agent]
 
-[figure]
+The pizza OrderBot is finally read to use. The OrderBot turned out to be upbeat, friendly, and addressed me by name. It could answer questions about the menu from the databas exactly as shown above.  Figure 16 shows an example of a correctly handled order.  Figure 17 shows the email summary that was sent.
 
-Then show the conversation history. The OrderBot was upbeat, friendly, and addressed me by name. The order summary was emailed to the correct address without problem.
+[fig16.png - conversation summary]
 
-conversation summary:
-[conversation_summary.png]
+[fig17.png - email order summary]
 
-final email summary:
-[orderBot_receipt.png]
+I am largely satisfied with the prototype OrderBot. I experienced some difficulty with getting the emails to be formatted consistently. Experiments around formatting the order summary as an HTML table did not work. Getting the LLM to use some HTML (e.g., line breaks) would be helpful for summarizing long orders. 
 
 Summary:
 
-In this article, have explored the ability
+In this article, I have examined ChatGPT's ability to query and reason about tabular data. I found some indication that tabular data (a pizza menu) stored as plain text can inspire LLM hallucinations. Splitting the menu into multiple database tables seems to mitigate, but not eliminate, hallucinations. Text-to-SQL capabilities are improving but still show brittleness. Finally, a custom agent OrderBot capable of reading from a database and sending an email was presented. 
 
-Note this article was produced with langchain 0.0.220 and ChatGPT gpt-3.5-turbo-0301.
+Note: This article was produced with langchain 0.0.220 and ChatGPT gpt-3.5-turbo-0301.
