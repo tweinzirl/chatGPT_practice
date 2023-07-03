@@ -25,9 +25,9 @@ To set up the database, dataframes were made for each each category of item (piz
 
 [Figure 4 - Pizza menu]
 
-ChatGPT was connected to the database via LangChain https://python.langchain.com/docs/get_started/introduction.html , an exciting new open source framework for incorporating LLMs into applications. The project that provides modular components for a) connecting LLMs to external data sources and b) accomplishing higher level tasks like as Q&A sessions. The components can be chained together to create arbitrarily complex applications. The short, and currently free, langchain course https://learn.deeplearning.ai/langchain/lesson/1/introduction from deeplearning.ai https://www.deeplearning.ai provides an accessible introduction to the package.
+ChatGPT was connected to the database via LangChain https://python.langchain.com/docs/get_started/introduction.html , an exciting new open source framework for incorporating LLMs into applications. The project that provides modular components for a) connecting LLMs to external data sources and b) accomplishing higher level tasks like as Q&A sessions. The components can be chained together to create arbitrarily complex applications. The short, and currently free, LangChain course https://learn.deeplearning.ai/LangChain/lesson/1/introduction from DeepLearning.AI https://www.deeplearning.ai provides an accessible introduction to the package.
 
-LangChain provides a SQLDatabaseChain component https://python.langchain.com/docs/modules/chains/popular/sqlite that is pre-configured to query data in any database compatible with SQLAlchemy. The tool implements established best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries, although futher customization of the prompt is possible. The minimal steps for setting up the SQLDatabaseChain include connecting to the database and initializing an LLM https://python.langchain.com/docs/modules/model_io/models/ (Figure 5).  After experimenting with my own prompt, I adopted the default prompt.
+LangChain provides a SQLDatabaseChain component https://python.langchain.com/docs/modules/chains/popular/sqlite that is pre-configured to query data in any database compatible with SQLAlchemy. The tool implements established best practices https://arxiv.org/abs/2204.00498 for prompting an LLM to write SQL queries, although further customization of the prompt is possible. The minimal steps for setting up the SQLDatabaseChain include connecting to the database and initializing an LLM https://python.langchain.com/docs/modules/model_io/models/ (Figure 5).  After experimenting with my own prompt, I adopted the default prompt.
 
 [fig5 - set up db chain and view custom prompt]
 
@@ -63,17 +63,17 @@ In this case, I tried out the SQLDatabaseSequentialChain https://python.langchai
 
 # Better Ingredients, Better PizzaBot
 
-Using the lessons learned above, I now assemble a custom pizza OrderBot that resolves the shortcomings around hallucinations that were shared above. In addition to working from a database representation of the pizza menu (Figure 4), I would like the bot to be able to send a summary of the order to the user's email. The bot will have to converse with the user in real time and know when to acccess tools for searching the database and sending the summary email.
+Using the lessons learned above, I now assemble a custom pizza OrderBot that resolves the shortcomings around hallucinations that were shared above. In addition to working from a database representation of the pizza menu (Figure 4), I would like the bot to be able to send a summary of the order to the user's email. The bot will have to converse with the user in real time and know when to access tools for searching the database and sending the summary email.
 
-The langchain Agent interface is able to select which, if any, of the available tools should be called based on the user input. 
-Referencing detailed examples (especially this one https://python.langchain.com/docs/modules/agents/how_to/sharedmemory_for_tools) from langchain's documentation, I was able prototype the desired functionality in my own customized agent.
+The LangChain Agent interface is able to select which, if any, of the available tools should be called based on the user input. 
+Referencing detailed examples (especially this one https://python.langchain.com/docs/modules/agents/how_to/sharedmemory_for_tools) from LangChain's documentation, I was able prototype the desired functionality in my own customized agent.
 
 The final solution https://github.com/tweinzirl/chatGPT_practice/blob/master/blog2/pizza_agent_v2.ipynb consists of the following components, which are customized separately before integration:
 \bullet
  - A conversational agent (langchain.agents.ConversationalAgent https://python.langchain.com/docs/modules/agents/agent_types/chat_conversation_agent.html) with a custom prompt spelling out its role as an OrderBot.
  - Conversation memory https://python.langchain.com/docs/modules/memory/ buffers (langchain.memory.ConversationBufferMemory, langchain.memory.ReadOnlySharedMemory)
  - SQLDatabaseChain for querying the pizza database (see the above implementation for details)
- - An LLMChain https://python.langchain.com/docs/modules/chains/foundational/llm_chain . This cain is specifically prompted to summarize the order given the conversation history (ReadOnlyShareMemory)
+ - An LLMChain https://python.langchain.com/docs/modules/chains/foundational/llm_chain . This chain is specifically prompted to summarize the order given the conversation history (ReadOnlyShareMemory)
  - A Custom email function: input is a single pipe-delimited string containing order summary and recipient email address
  - An underlying LLM (gpt-3.5-turbo)
 \bullet
@@ -90,7 +90,7 @@ The Send Email tool (Figure 12) is the most interesting. I specify in the descri
 
 [fig12.png - send_message function]
 
-To make the OrderBot more self-aware about its role in the pizza ordering process, the ConversationalAgent's prompt needs to be edited. This prompt is detailed an includes a prefix, a description of available tools, and a suffix. I use the prefix to explain the OrderBot;s function. The tool list is automatically populated from the existing list of tools. The suffix has placefholders for the chat history, user input, and a scratchpad for the agent to compose a response. Figure 13 shows the code for updating the prompt while Figure 14 shows the fully formatted prompt template.
+To make the OrderBot more self-aware about its role in the pizza ordering process, the ConversationalAgent's prompt needs to be edited. This prompt is detailed an includes a prefix, a description of available tools, and a suffix. I use the prefix to explain the OrderBot;s function. The tool list is automatically populated from the existing list of tools. The suffix has placeholders for the chat history, user input, and a scratchpad for the agent to compose a response. Figure 13 shows the code for updating the prompt while Figure 14 shows the fully formatted prompt template.
 
 [fig13 - customize the agent prompt]
 
@@ -100,7 +100,7 @@ As shown in Figure 15, the final agent chain (agent_chain) comes from bringing t
 
 [fig15 - combining all the pieces for the agent]
 
-The pizza OrderBot is finally read to use. The OrderBot turned out to be upbeat, friendly, and addressed me by name. It could answer questions about the menu from the databas exactly as shown above.  Figure 16 shows an example of a correctly handled order.  Figure 17 shows the email summary that was sent.
+The pizza OrderBot is finally read to use. The OrderBot turned out to be upbeat, friendly, and addressed me by name. It could answer questions about the menu from the database exactly as shown above.  Figure 16 shows an example of a correctly handled order.  Figure 17 shows the email summary that was sent.
 
 [fig16.png - conversation summary]
 
@@ -112,4 +112,4 @@ Summary:
 
 In this article, I have examined ChatGPT's ability to query and reason about tabular data. I found some indication that tabular data (a pizza menu) stored as plain text can inspire LLM hallucinations. Splitting the menu into multiple database tables seems to mitigate, but not eliminate, hallucinations. Text-to-SQL capabilities are improving but still show brittleness. Finally, a custom agent OrderBot capable of reading from a database and sending an email was presented. 
 
-Note: This article was produced with langchain 0.0.220 and ChatGPT gpt-3.5-turbo-0301.
+Note: This article was produced with LangChain 0.0.220 and ChatGPT gpt-3.5-turbo-0301.
