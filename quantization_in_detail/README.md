@@ -10,7 +10,6 @@ Linear quanitization diagram
 ```bash
 r_min = -234.1                                  r_max = 251.51
   |_______________________________________________|
-
    \                                             /
     \                                           /
      \                                         /
@@ -33,18 +32,18 @@ where:
  - z is the zero point parameter.
  
 How to determine scale s and zeropoint z:
- - s = (r_max – r_min) / (q_max – q_min)
- - z = int( round( q_min – r_min/s))
+ - s = (r$_{max}$ – r$_{min}$) / (q$_{max}$ – q$_{min}$)
+ - z = int( round( q$_{min}$ – r$_{min}$/s))
  
 because:
- - r_min = s * (q_min – z)
- - r_max = s * (q_max – z)
+ - r$_{min}$ = s * (q$_{min}$ – z)
+ - r$_{max}$ = s * (q$_{max}$ – z)
  
-If zeropoint is out of range in new scale, set it to q_min or q_max, whichever is nearer
+If zeropoint is out of range in new scale, set it to q$_{min}$ or q$_{max}$, whichever is nearer
 
-In symmetric quantization, zerpoint is 0: [-r_max, r_max] -> [-q_max, q_max] (simpler and saves memory by not storing a zeropoint)
+In symmetric quantization, zerpoint is 0: [-r$_{max}$, r$_{max}$] -> [-q$_{max}$, q$_{max}$] (simpler and saves memory by not storing a zeropoint)
 
-In Asymmetric quantization: [r_min, r_max] -> [q_min, q_max]
+In Asymmetric quantization: [r$_{min}$, r$_{max}$] -> [q$_{min}$, q$_{max}$]
 
 Quantization granularity:
  - Per tensor
